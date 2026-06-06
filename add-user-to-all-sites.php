@@ -1,17 +1,17 @@
 <?php
 /**
- * Author URI:        https://github.com/barryceelen/
- * Author:            Barry Ceelen
+ * Author:            Plugin Pizza
+ * Author URI:        https://plugin.pizza
  * Description:       A CLI command that helps you add an existing user to all sites in a multisite network.
  * Domain Path:       /languages
  * License:           GPLv3+
  * Plugin Name:       Add User to All Sites
- * Plugin URI:        https://github.com/barryceelen/add-user-to-all-sites/
+ * Plugin URI:        https://github.com/pluginpizza/add-user-to-all-sites/
  * Text Domain:       add-user-to-all-sites
  * Version:           1.0.0
  * Requires PHP:      5.3.0
  * Requires at least: 3.1.0
- * GitHub Plugin URI: barryceelen/add-user-to-all-sites
+ * GitHub Plugin URI: pluginpizza/add-user-to-all-sites
  *
  * @package AddUserToAllSites
  */
