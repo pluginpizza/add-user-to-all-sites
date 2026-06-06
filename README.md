@@ -8,7 +8,7 @@ Registers a CLI command that allows you to add a user to all sites in a multisit
 
 ## Options
 
-**<user>…**
+**\<user\>…**
 
 The user login, user email or user ID of the user(s) to update.
 
