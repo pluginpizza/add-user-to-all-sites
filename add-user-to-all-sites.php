@@ -2,7 +2,7 @@
 /**
  * Author URI:        https://github.com/barryceelen/
  * Author:            Barry Ceelen
- * Description:       A CLI command that helps you add a user to all sites in a multisite network.
+ * Description:       A CLI command that helps you add an existing user to all sites in a multisite network.
  * Domain Path:       /languages
  * License:           GPLv3+
  * Plugin Name:       Add User to All Sites
@@ -40,7 +40,7 @@ class Add_User_To_All_Sites_Command {
 	}
 
 	/**
-	 * Adds a user to all sites in a multisite network.
+	 * Adds an existing user to all sites in a multisite network.
 	 *
 	 * ## OPTIONS
 	 *
@@ -48,15 +48,15 @@ class Add_User_To_All_Sites_Command {
 	 * : The user login, user email, or user ID of the user to add.
 	 *
 	 * [--role=<role>]
-	 * : A string used to set the user's role on each site. Defaults to
-	 * `subscriber` if not set. If the user already exists on a site their
-	 * existing role will be updated.
+	 * : A string used to set the role of newly added users on each site.
+	 * Defaults to `subscriber` if not set. If the user already exists on
+	 * a site they will keep their existing role.
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp add-user_to_all_sites 123 --role=administrator
-	 *     wp add-user_to_all_sites bob --role=editor
-	 *     wp add-user_to_all_sites bob@example.com
+	 *     wp add-user-to-all-sites 123 --role=administrator
+	 *     wp add-user-to-all-sites bob --role=editor
+	 *     wp add-user-to-all-sites bob@example.com
 	 *
 	 * @param array $args       The array of positional arguments.
 	 * @param array $assoc_args The array of associative arguments.
@@ -72,7 +72,17 @@ class Add_User_To_All_Sites_Command {
 
 		foreach ( $sites as $site ) {
 
-			$url    = untrailingslashit( $site->domain . $site->path );
+			$url = untrailingslashit( $site->domain . $site->path );
+
+			/*
+			 * If the user already belongs to this site, skip it to
+			 * preserve their existing role.
+			 */
+			if ( is_user_member_of_blog( $user->ID, $site->blog_id ) ) {
+				WP_CLI::log( "User already exists on {$url}, skipping." );
+				continue;
+			}
+
 			$result = add_user_to_blog( $site->blog_id, $user->ID, $role );
 
 			if ( is_wp_error( $result ) ) {
