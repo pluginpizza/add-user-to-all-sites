@@ -2,7 +2,7 @@
 /**
  * Author URI:        https://github.com/barryceelen/
  * Author:            Barry Ceelen
- * Description:       A CLI command that allows you to add a user to all sites in a multisite network.
+ * Description:       A CLI command that helps you add a user to all sites in a multisite network.
  * Domain Path:       /languages
  * License:           GPLv3+
  * Plugin Name:       Add User to All Sites
@@ -24,37 +24,47 @@ if ( ! defined( 'WP_CLI' ) ) {
  * CLI command class.
  */
 class Add_User_To_All_Sites_Command {
+
+	/**
+	 * User fetcher.
+	 *
+	 * @var \WP_CLI\Fetchers\User
+	 */
+	private $fetcher;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->fetcher = new \WP_CLI\Fetchers\User();
+	}
+
 	/**
 	 * Adds a user to all sites in a multisite network.
 	 *
 	 * ## OPTIONS
 	 *
-	 * --email=<email>
-	 * : The email address of the user.
+	 * <user>
+	 * : The user login, user email, or user ID of the user to add.
 	 *
-	 * --role=<role>
-	 * : The role that should be assigned to the user on each site. Defaults to subscriber if not set. If the user
-	 *   already exists on a site its role will be updated.
+	 * [--role=<role>]
+	 * : A string used to set the user's role on each site. Defaults to
+	 * `subscriber` if not set. If the user already exists on a site their
+	 * existing role will be updated.
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp add_user_to_all_sites --email=test@example.com --role=administrator
+	 *     wp add-user_to_all_sites 123 --role=administrator
+	 *     wp add-user_to_all_sites bob --role=editor
+	 *     wp add-user_to_all_sites bob@example.com
 	 *
-	 * @param array $args The array of arguments.
-	 * @param array $assoc_args The array of assoc args.
+	 * @param array $args       The array of positional arguments.
+	 * @param array $assoc_args The array of associative arguments.
 	 * @return void
 	 */
 	public function __invoke( $args, $assoc_args ) {
 
-		if ( ! is_email( $assoc_args['email'] ) ) {
-			WP_CLI::error( "The {$assoc_args['email']} email address is not valid." );
-		}
-
-		$user = get_user_by( 'email', $assoc_args['email'] );
-
-		if ( ! $user ) {
-			WP_CLI::error( "No user found with the {$assoc_args['email']} email address." );
-		}
+		$user = $this->fetcher->get_check( $args[0] );
 
 		$error_count = 0;
 		$role        = empty( $assoc_args['role'] ) ? 'subscriber' : trim( $assoc_args['role'] );
@@ -68,6 +78,7 @@ class Add_User_To_All_Sites_Command {
 			if ( is_wp_error( $result ) ) {
 
 				$message = $result->get_error_message();
+				++$error_count;
 
 				WP_CLI::log( "An error occurred adding user to {$url}: {$message}" );
 
@@ -79,7 +90,7 @@ class Add_User_To_All_Sites_Command {
 		WP_CLI::log(
 			sprintf(
 				'Adding user %s to all sites completed%s.',
-				$assoc_args['email'],
+				$user->user_login,
 				0 === $error_count ? '' : " with {$error_count} errors."
 			)
 		);
@@ -87,7 +98,7 @@ class Add_User_To_All_Sites_Command {
 }
 
 WP_CLI::add_command(
-	'add_user_to_all_sites',
+	'add-user-to-all-sites',
 	'Add_User_To_All_Sites_Command',
 	array(
 		'before_invoke' => function () {

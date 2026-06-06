@@ -4,14 +4,14 @@ Registers a CLI command that allows you to add a user to all sites in a multisit
 
 ## Use
 
-`wp add_user_to_all_sites --email=test@example.com --role=administrator`
+`wp add-user-to-all-sites 123 --role=administrator`
 
-The command accepts two options:
+## Options
 
-**email**
+**<user>…**
 
-The email address of the user.
+The user login, user email or user ID of the user(s) to update.
 
 **role**
 
-The role that should be assigned to the user on each site. Defaults to `subscriber` if not set. If the user already exists on a site its role will be updated.
+A string used to set the user’s role on each site. Defaults to `subscriber` if not set. If the user already exists on a site their existing role will be updated.
